@@ -115,7 +115,7 @@ This is "Hello, world" in haskell-gi
 
 ## Modifying State in a Callback {.fragile}
 
-``` {.haskell include=src/examples/src/Imperative/Callbacks.hs snippet=editableNamesList emphasize=7-11}
+``` {.haskell include=src/examples/src/Imperative/Callbacks.hs snippet=editableNamesList}
 ```
 
 ## Using the Editable List

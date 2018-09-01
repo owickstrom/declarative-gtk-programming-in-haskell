@@ -179,14 +179,15 @@ This is “Hello, world” in haskell-gi (explain code)
 
   forM_ (zip initialNames [0 ..]) $ \(name, i) -&gt; do
     textEntry &lt;- new Gtk.Entry [#text := name]
-<mark class="block">    void . on textEntry #changed $ do</mark>
-<mark class="block">      newName &lt;- get textEntry #text</mark>
-<mark class="block">      atomicModifyIORef&#39; namesRef $ \oldNames -&gt;</mark>
-<mark class="block">        let newNames = oldNames &amp; ix i .~ newName</mark>
-<mark class="block">        in (newNames, ())</mark>
+    void . on textEntry #changed $ do
+      newName &lt;- get textEntry #text
+      atomicModifyIORef&#39; namesRef $ \oldNames -&gt;
+        let newNames = oldNames &amp; ix i .~ newName
+        in (newNames, ())
     #add list textEntry
 
-  Gtk.toWidget list</code></pre>
+  Gtk.toWidget list
+</code></pre>
 </section><section id="using-the-editable-list" class="slide level2">
 <h2>Using the Editable List</h2>
 <pre class="haskell"><code>main = do
