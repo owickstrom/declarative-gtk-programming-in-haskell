@@ -199,7 +199,7 @@ This is “Hello, world” in haskell-gi (explain code)
 <aside class="notes">
 <ul>
 <li>To use the editable names list, …</li>
-<li>BUT, there’s a big problem here. We can’t observe the changes from the outside.</li>
+<li>BUT, there’s a big problem here. We don’t get notified of modifications.</li>
 <li>So let’s fix that…</li>
 </ul>
 </aside>
@@ -276,7 +276,7 @@ This is “Hello, world” in haskell-gi (explain code)
 <h2>gi-gtk-declarative</h2>
 <ul>
 <li><a href="https://github.com/owickstrom/gi-gtk-declarative">github.com/owickstrom/gi-gtk-declarative</a></li>
-<li>Very thin layer on top of <code>haskell-gi</code>
+<li>Very thin layer on top of <code>gi-gtk</code>
 <ul>
 <li>Uses <code>OverloadedLabels</code> and type-level goodies</li>
 <li>Automatic support for declarative and patchable GTK+ widgets</li>

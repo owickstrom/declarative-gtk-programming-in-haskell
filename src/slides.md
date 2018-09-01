@@ -130,8 +130,7 @@ main = do
 
 <aside class="notes">
 * To use the editable names list, ...
-* BUT, there's a big problem here. We can't observe the changes from the
-  outside.
+* BUT, there's a big problem here. We don't get notified of modifications.
 * So let's fix that...
 </aside>
 
@@ -188,7 +187,7 @@ main = do
 ## gi-gtk-declarative
 
 * [github.com/owickstrom/gi-gtk-declarative](https://github.com/owickstrom/gi-gtk-declarative)
-* Very thin layer on top of `haskell-gi`
+* Very thin layer on top of `gi-gtk`
     - Uses `OverloadedLabels` and type-level goodies
     - Automatic support for declarative and patchable GTK+ widgets
     - Monadic markup builder for do-notation
