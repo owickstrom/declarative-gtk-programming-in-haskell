@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Oskar Wickström">
+  <title>Declarative GTK+ Programming with Haskell</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/owickstrom.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="highlight.js/styles/idea.css">
+  <script src="highlight.js/highlight.pack.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Declarative GTK+ Programming with Haskell</h1>
+  <p class="author">Oskar Wickström</p>
+  <p class="date">September 2018</p>
+</section>
+
+<section id="my-project-fastcut" class="slide level2">
+<h2>My Project: FastCut</h2>
+<table>
+<tr>
+<td>
+<ul>
+<li>Video editor specialized for screencasts</li>
+<li>Written in GHC Haskell</li>
+<li>Desktop GUI application</li>
+<li>Goals
+<ul>
+<li>Minimal, do one thing really well</li>
+<li>Core application logic should be pure</li>
+<li>Portable</li>
+<li>Reasonably snappy</li>
+<li>Open source once documented and more useful
+</td>
+<td width="45%">
+<img data-src="images/fastcut.png" alt="FastCut" />
+</td>
+</tr>
+</table></li>
+</ul></li>
+</ul>
+<aside class="notes">
+The project got me looking into GTK+ and Haskell is FastCut, …
+</aside>
+</section>
+<section id="desktop-gui-frameworks-and-haskell" class="slide level2">
+<h2>Desktop GUI Frameworks and Haskell</h2>
+<ul>
+<li>Imperative
+<ul>
+<li>GTK+</li>
+<li>Qt</li>
+<li>wxWidgets</li>
+<li>FLTK</li>
+</ul></li>
+<li>Declarative
+<ul>
+<li>Reflex</li>
+<li>Threepenny-gui</li>
+<li>(Custom WebKit with PureScript or Elm)</li>
+</ul></li>
+</ul>
+<aside class="notes">
+<p>When starting the FastCut project, I looked into different desktop GUI frameworks…</p>
+End: “I eventually chose GTK for FastCut.”
+</aside>
+</section>
+<section id="gtk" class="slide level2">
+<h2>GTK+</h2>
+<table>
+<tr>
+<td>
+<ul>
+<li>Idiomatic GTK+ Programming
+<ul>
+<li>Create widgets imperatively</li>
+<li>Set attributes</li>
+<li>Attach handers (callbacks) to signals</li>
+</ul></li>
+<li>GTK+ Builder and Glade
+<ul>
+<li>XML markup</li>
+<li>WYSIWYG editor</li>
+<li>Declarative for first render, then imperative</li>
+</ul></li>
+<li>CSS support (limited)</li>
+<li>GObject Introspection
+</td>
+<td width="30%" valign="top">
+<img data-src="images/gtk-logo.png" alt="GTK+ Logo" />
+</td>
+</tr>
+</table></li>
+</ul>
+<aside class="notes">
+When looking at GTK source code and examples, I’ve found that idiomatic GTK …
+</aside>
+</section>
+<section><section id="haskell-and-gtk" class="title-slide slide level1"><h1>Haskell and GTK+</h1></section><section id="haskell-gtk-bindings" class="slide level2">
+<h2>Haskell GTK+ Bindings</h2>
+<ul>
+<li>gtk2hs
+<ul>
+<li>Deprecated in favour of haskell-gi</li>
+</ul></li>
+<li>haskell-gi
+<ul>
+<li>Mostly generated using GObject introspection</li>
+<li><code>OverloadedLabels</code> for methods, attributes, and signals</li>
+<li>Includes many packages</li>
+<li>gi-gtk is the library I’ll focus on today</li>
+</ul></li>
+</ul>
+</section><section id="hello-world-with-gi-gtk" class="slide level2">
+<h2>“Hello, world!” with gi-gtk</h2>
+<pre class="haskell"><code>main :: IO ()
+main = do
+  _ &lt;- Gtk.init Nothing
+  win &lt;- new Gtk.Window [#title := &quot;Hi there&quot;]
+  #resize win 200 150
+  _ &lt;- on win #destroy Gtk.mainQuit
+  button &lt;- new Gtk.Button [#label := &quot;Click me&quot;]
+  _ &lt;- on button
+     #clicked
+     (set button [#sensitive := False, #label := &quot;Thanks for clicking me&quot;])
+  #add win button
+  #showAll win
+  Gtk.main
+</code></pre>
+<aside class="notes">
+This is “Hello, world” in haskell-gi (explain code)
+</aside>
+</section></section>
+<section><section id="hello-world" class="title-slide slide level1 demo"><h1>“Hello, world!”</h1></section></section>
+<section><section id="slightly-larger-example" class="title-slide slide level1"><h1>Slightly Larger Example</h1></section><section id="an-editable-list-of-names" class="slide level2">
+<h2>An Editable List of Names</h2>
+<pre class="haskell"><code>editableNamesList :: IORef [Text] -&gt; IO Gtk.Widget
+</code></pre>
+<aside class="notes">
+<ul>
+<li>Let’s say we are going define <code>editableNameList</code> with this type</li>
+<li>It should be a reusable component</li>
+<li>It could look like this: …</li>
+</ul>
+</aside>
+</section><section id="modifying-state-in-a-callback" class="slide level2 fragile">
+<h2>Modifying State in a Callback</h2>
+<pre class="haskell"><code>editableNamesList namesRef = do
+  list     &lt;- new Gtk.ListBox []
+  initialNames &lt;- readIORef namesRef
+
+  forM_ (zip initialNames [0 ..]) $ \(name, i) -&gt; do
+    textEntry &lt;- new Gtk.Entry [#text := name]
+<mark class="block">    void . on textEntry #changed $ do</mark>
+<mark class="block">      newName &lt;- get textEntry #text</mark>
+<mark class="block">      atomicModifyIORef&#39; namesRef $ \oldNames -&gt;</mark>
+<mark class="block">        let newNames = oldNames &amp; ix i .~ newName</mark>
+<mark class="block">        in (newNames, ())</mark>
+    #add list textEntry
+
+  Gtk.toWidget list</code></pre>
+</section><section id="using-the-editable-list" class="slide level2">
+<h2>Using the Editable List</h2>
+<pre class="haskell"><code>main = do
+  ...</code></pre>
+<pre class="haskell"><code>  namesRef &lt;- newIORef [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;]
+  list &lt;- editableNamesList namesRef
+  #add win list
+</code></pre>
+<aside class="notes">
+<ul>
+<li>To use the editable names list, …</li>
+<li>BUT, there’s a big problem here. We can’t observe the changes from the outside.</li>
+<li>So let’s fix that…</li>
+</ul>
+</aside>
+</section><section id="an-editable-list-of-names-with-updates" class="slide level2">
+<h2>An Editable List of Names with Updates</h2>
+<pre class="haskell"><code>editableNamesList :: [Text] -&gt; IO (Gtk.Widget, Chan [Text])
+</code></pre>
+<aside class="notes">
+<ul>
+<li>Instead of mutating IORefs, we will publish updates…</li>
+</ul>
+</aside>
+</section><section id="sending-state-updates-on-a-channel" class="slide level2 fragile">
+<h2>Sending State Updates on a Channel</h2>
+<pre class="haskell"><code>editableNamesList initialNames = do
+<mark class="block">  updates  &lt;- newChan</mark>
+<mark class="block">  namesRef &lt;- newIORef initialNames</mark>
+  list     &lt;- new Gtk.ListBox []
+
+  forM_ (zip initialNames [0 ..]) $ \(name, i) -&gt; do
+    textEntry &lt;- new Gtk.Entry [#text := name]
+    void . on textEntry #changed $ do
+      newName &lt;- get textEntry #text
+<mark class="block">      writeChan updates =&lt;&lt;</mark>
+<mark class="block">        (atomicModifyIORef&#39; namesRef $ \oldNames -&gt;</mark>
+<mark class="block">          let newNames = oldNames &amp; ix i .~ newName</mark>
+<mark class="block">          in (newNames, newNames))</mark>
+    #add list textEntry
+
+  widget &lt;- Gtk.toWidget list
+  return (widget, updates)</code></pre>
+</section><section id="printing-updates" class="slide level2">
+<h2>Printing Updates</h2>
+<pre class="haskell"><code>main = do
+  ...</code></pre>
+<pre class="haskell"><code>  (list, updates) &lt;- editableNamesList [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;]
+  void . forkIO . forever $ do
+    names &lt;- readChan updates
+    print names
+  #add win list
+</code></pre>
+</section><section id="callback-problems" class="slide level2">
+<h2>Callback Problems</h2>
+<ul>
+<li>When the application grows, callbacks gets unwieldy
+<ul>
+<li><code>IORef</code>s, scattered state and logic</li>
+<li>Side effects</li>
+<li>Impractical to test</li>
+<li>Two phases: first construction, subsequent updates</li>
+</ul></li>
+<li>GUI code should be:
+<ul>
+<li>A separate concern</li>
+<li>Declarative</li>
+<li>Concise</li>
+</ul></li>
+<li>Core application logic should be:
+<ul>
+<li>Pure (ideally!)</li>
+<li>Decoupled from GUI code</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="going-declarative" class="title-slide slide level1"><h1>Going Declarative</h1></section><section id="declarative-gtk" class="slide level2">
+<h2>Declarative GTK+</h2>
+<ul>
+<li>Declarative markup, pure functions from state to markup</li>
+<li>Declarative event handling, not concurrency primitives</li>
+<li>“Virtual DOM” patching</li>
+<li>Not tied to any particular architecture</li>
+</ul>
+</section><section id="gi-gtk-declarative" class="slide level2">
+<h2>gi-gtk-declarative</h2>
+<ul>
+<li><a href="https://github.com/owickstrom/gi-gtk-declarative">github.com/owickstrom/gi-gtk-declarative</a></li>
+<li>Very thin layer on top of <code>haskell-gi</code>
+<ul>
+<li>Uses <code>OverloadedLabels</code> and type-level goodies</li>
+<li>Automatic support for declarative and patchable GTK+ widgets</li>
+<li>Monadic markup builder for do-notation</li>
+</ul></li>
+<li>Soon on a Hackage near you</li>
+</ul>
+<aside class="notes">
+<ul>
+<li>END: Let’s look at how you can write markup using this library.</li>
+</ul>
+</aside>
+</section><section id="single-widgets" class="slide level2">
+<h2>Single Widgets</h2>
+<ul>
+<li><p>Single widgets (without children) are constructed using <code>widget</code>:</p>
+<pre class="haskell"><code>widget Button []
+</code></pre>
+<pre class="haskell"><code>widget CheckButton []
+</code></pre></li>
+</ul>
+</section><section id="bins" class="slide level2">
+<h2>Bins</h2>
+<ul>
+<li><p>In GTK+, a <em>bin</em> can only contain a single child widget</p>
+<pre class="haskell"><code>bin ScrolledWindow [] $
+  widget Button []
+</code></pre></li>
+<li>Other examples are:
+<ul>
+<li><code>Expander</code></li>
+<li><code>Viewport</code></li>
+<li><code>SearchBar</code></li>
+</ul></li>
+<li><p>To embed many widgets in a bin, use an in-between <em>container</em></p></li>
+</ul>
+</section><section id="containers" class="slide level2">
+<h2>Containers</h2>
+<ul>
+<li>Containers can contain zero or more child widgets</li>
+<li><p>Some containers restrict the type of their children:</p>
+<ul>
+<li><p><code>ListBox</code> requires each child to be a <code>ListBoxRow</code>:</p>
+<pre class="haskell"><code>container ListBox [] $ do
+  bin ListBoxRow [] $ widget Button []
+  bin ListBoxRow [] $ widget Button []
+</code></pre></li>
+<li><p><code>Box</code> requires each child to be a <code>BoxChild</code>:</p>
+<pre class="haskell"><code>container Box [] $ do
+  boxChild False False 0 $ widget Button []
+  boxChild True True 0 $ widget Button []
+</code></pre></li>
+</ul></li>
+</ul>
+</section><section id="attributes" class="slide level2">
+<h2>Attributes</h2>
+<ul>
+<li><p>Widget attributes:</p>
+<pre class="haskell"><code>widget Button [#label := &quot;Click Here&quot;]
+</code></pre></li>
+<li><p>Bin attributes:</p>
+<pre class="haskell"><code>bin ScrolledWindow [ #hscrollbarPolicy := PolicyTypeAutomatic ] $
+  someSuperWideWidget
+</code></pre></li>
+<li><p>Container attributes:</p>
+<pre class="haskell"><code>container ListBox [ #selectionMode := SelectionModeMultiple ] $
+  children
+</code></pre></li>
+</ul>
+</section><section id="events" class="slide level2 fragile">
+<h2>Events</h2>
+<ul>
+<li><p>Using <code>on</code>, you can emit events:</p>
+<pre class="haskell"><code>counterButton clickCount =
+  let msg = &quot;I&#39;ve been clicked &quot;
+            &lt;&gt; Text.pack (show clickCount)
+            &lt;&gt; &quot; times.&quot;
+  in widget
+      Button
+      [ #label := msg
+      , <mark class="inline">on #clicked ButtonClicked</mark>
+      ]</code></pre></li>
+</ul>
+</section><section id="events-using-io" class="slide level2 fragile">
+<h2>Events using IO</h2>
+<ul>
+<li><p>Some events need to be constructed in IO, to query widgets for attributes</p>
+<pre class="haskell"><code>onM                          -- very simplified
+  :: Gtk.SignalProxy widget
+  -&gt; <mark class="inline">(widget -&gt; IO event)</mark>
+  -&gt; Attribute widget event</code></pre></li>
+<li><p>Example emitting events with chosen color:</p>
+<pre class="haskell"><code>colorButton color =
+  widget
+  ColorButton
+  [ #title := &quot;Selected color&quot;
+  , #rgba := color
+  , onM #colorSet <mark class="inline">(fmap ColorChanged . getColorButtonRgba)</mark>
+  ]</code></pre></li>
+</ul>
+</section><section id="functors" class="slide level2 fragile">
+<h2>Functors</h2>
+<ul>
+<li>Markup, Widget, Bin, and Container all have <code>Functor</code> instances</li>
+<li><p>We can map other events to our application’s event type:</p>
+<pre class="haskell"><code>data ButtonEvent = ButtonClicked
+
+clickyButton :: Text -&gt; Widget ButtonEvent
+</code></pre>
+<pre class="haskell"><code>data MyEvent = Incr | Decr
+
+incrDecrButtons :: <mark class="inline">Widget MyEvent</mark>
+incrDecrButtons =
+  container Box [#orientation := OrientationHorizontal] $ do
+    boxChild True True 0 $ <mark class="inline">clickyButton &quot;-1&quot; $&gt; Decr</mark>
+    boxChild True True 0 $ <mark class="inline">clickyButton &quot;+1&quot; $&gt; Incr</mark></code></pre></li>
+</ul>
+</section><section id="css-classes" class="slide level2 fragile">
+<h2>CSS Classes</h2>
+<ul>
+<li><p>CSS classes are added using <code>classes</code>:</p>
+<pre class="haskell"><code>  widget Button [<mark class="inline">classes [&quot;big-button&quot;]</mark>, #label := &quot;CLICK ME&quot;]</code></pre></li>
+</ul>
+<aside class="notes">
+<ul>
+<li>Finally there is support for CSS classes</li>
+<li>What you’ve seen is the declarative markup library</li>
+<li>I’ve also been working on a simple framework called …</li>
+</ul>
+</aside>
+</section></section>
+<section><section id="gi.gtk.declarative.app.simple" class="title-slide slide level1"><h1>GI.Gtk.Declarative.App.Simple</h1></section><section id="gi.gtk.declarative.app.simple-1" class="slide level2">
+<h2>GI.Gtk.Declarative.App.Simple</h2>
+<ul>
+<li>State reducer</li>
+<li>Inspired by PureScript’s Pux framework</li>
+<li>Also comparable to earlier versions of <em>The Elm Architecture</em></li>
+</ul>
+</section><section id="app" class="slide level2">
+<h2>App</h2>
+<pre class="haskell"><code>data App model event =
+  App
+    { update :: model -&gt; event -&gt; (model, IO (Maybe event))
+    , view   :: model -&gt; Widget event
+    , inputs :: [Producer event IO ()]
+    }</code></pre>
+</section><section id="running" class="slide level2">
+<h2>Running</h2>
+<pre class="haskell"><code>run
+  :: Typeable event
+  =&gt; Text                 -- ^ Window title
+  -&gt; Maybe (Int32, Int32) -- ^ Optional window size
+  -&gt; App model event      -- ^ Application
+  -&gt; model                -- ^ Initial model
+  -&gt; IO ()</code></pre>
+</section></section>
+<section><section id="revisiting-hello-world" class="title-slide slide level1"><h1>Revisiting “Hello, world!”</h1></section><section id="imperative-style-hello-world" class="slide level2">
+<h2>Imperative Style “Hello, world!”</h2>
+<pre class="haskell"><code>main :: IO ()
+main = do
+  _ &lt;- Gtk.init Nothing
+  win &lt;- new Gtk.Window [#title := &quot;Hi there&quot;]
+  #resize win 200 150
+  _ &lt;- on win #destroy Gtk.mainQuit
+  button &lt;- new Gtk.Button [#label := &quot;Click me&quot;]
+  _ &lt;- on button
+     #clicked
+     (set button [#sensitive := False, #label := &quot;Thanks for clicking me&quot;])
+  #add win button
+  #showAll win
+  Gtk.main
+</code></pre>
+</section><section id="model-and-events" class="slide level2">
+<h2>Model and Events</h2>
+<pre class="haskell"><code>data Model = NotClicked | Clicked
+
+data Event = ButtonClicked
+</code></pre>
+</section><section id="view" class="slide level2">
+<h2>View</h2>
+<pre class="haskell"><code>view&#39; :: Model -&gt; Widget Event
+view&#39; = \case
+  NotClicked -&gt;
+    widget Button [#label := &quot;Click me&quot;, on #clicked ButtonClicked]
+  Clicked -&gt;
+    widget Button [#sensitive := False, #label := &quot;Thanks for clicking me&quot;]
+</code></pre>
+</section><section id="update" class="slide level2">
+<h2>Update</h2>
+<pre class="haskell"><code>update&#39; :: Model -&gt; Event -&gt; (Model, IO (Maybe Event))
+update&#39; _ ButtonClicked = (Clicked, return Nothing)
+</code></pre>
+</section><section id="run" class="slide level2">
+<h2>Run</h2>
+<pre class="haskell"><code>main :: IO ()
+main = run &quot;Hi there&quot; (Just (200, 150)) app NotClicked
+  where app = App {view = view&#39;, update = update&#39;, inputs = []}
+</code></pre>
+</section></section>
+<section><section id="revisiting-editable-names" class="title-slide slide level1"><h1>Revisiting Editable Names</h1></section><section id="editable-list-of-names-imperative-style" class="slide level2">
+<h2>Editable List of Names, Imperative Style</h2>
+<pre class="haskell"><code>editableNamesList initialNames = do
+  updates  &lt;- newChan
+  namesRef &lt;- newIORef initialNames
+  list     &lt;- new Gtk.ListBox []
+
+  forM_ (zip initialNames [0 ..]) $ \(name, i) -&gt; do
+    textEntry &lt;- new Gtk.Entry [#text := name]
+    void . on textEntry #changed $ do
+      newName &lt;- get textEntry #text
+      writeChan updates =&lt;&lt;
+        (atomicModifyIORef&#39; namesRef $ \oldNames -&gt;
+          let newNames = oldNames &amp; ix i .~ newName
+          in (newNames, newNames))
+    #add list textEntry
+
+  widget &lt;- Gtk.toWidget list
+  return (widget, updates)
+</code></pre>
+</section><section id="model-and-events-1" class="slide level2">
+<h2>Model and Events</h2>
+<pre class="haskell"><code>data Model = Model [Text]
+
+data Event = NameChanged Int Text
+</code></pre>
+</section><section id="view-1" class="slide level2">
+<h2>View</h2>
+<pre class="haskell"><code>view&#39; :: Model -&gt; Widget Event
+view&#39; (Model names) =
+  container ListBox [] (zipWithM_ renderNameEntry names [0 ..])
+  where
+    renderNameEntry name i =
+      bin ListBoxRow [] $
+        widget Entry [ #text := name
+                     , onM #changed (fmap (NameChanged i) . entryGetText)
+                     ]
+</code></pre>
+</section><section id="update-1" class="slide level2">
+<h2>Update</h2>
+<pre class="haskell"><code>update&#39; :: Model -&gt; Event -&gt; (Model, IO (Maybe Event))
+update&#39; (Model names) (NameChanged i newName) =
+  ( Model (names &amp; ix i .~ newName)
+  , print newName $&gt; Nothing
+  )
+</code></pre>
+</section><section id="run-1" class="slide level2">
+<h2>Run</h2>
+<pre class="haskell"><code>main :: IO ()
+main = run &quot;Editable Names&quot;
+           (Just (640, 480))
+           app
+           (Model [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Carol&quot;])
+  where app = App {view = view&#39;, update = update&#39;, inputs = []}
+</code></pre>
+</section></section>
+<section><section id="implementation" class="title-slide slide level1"><h1>Implementation</h1></section><section id="patchable" class="slide level2">
+<h2>Patchable</h2>
+<pre class="haskell"><code>class Patchable widget where
+  create :: widget e -&gt; IO Gtk.Widget
+  patch :: widget e1 -&gt; widget e2 -&gt; Patch
+
+data Patch
+  = Modify (Gtk.Widget -&gt; IO ())
+  | Replace (IO Gtk.Widget)
+  | Keep</code></pre>
+</section><section id="heterogeneous-widgets" class="slide level2">
+<h2>Heterogeneous Widgets</h2>
+<ul>
+<li><p>Widgets are wrapped in the dynamic <code>Widget</code> data structure:</p>
+<pre class="haskell"><code>data Widget event where
+  Widget
+    :: ( Typeable widget
+       , Patchable widget
+       , Functor widget
+       , EventSource widget
+       )
+    =&gt; widget event
+    -&gt; Widget event</code></pre></li>
+<li><p>Similar to <code>Data.Dynamic</code></p></li>
+</ul>
+</section><section id="patching-widgets" class="slide level2 fragile">
+<h2>Patching Widgets</h2>
+<pre class="haskell"><code>instance Patchable Widget where
+  create (Widget w) = create w
+  patch (Widget (<mark class="inline">w1 :: t1 e1</mark>)) (Widget (<mark class="inline">w2 :: t2 e2</mark>)) =
+    case <mark class="inline">eqT @t1 @t2</mark> of
+      Just Refl -&gt; patch w1 w2
+      _         -&gt; Replace (create w2)</code></pre>
+<ul>
+<li>“The class Typeable allows a concrete representation of a type to be calculated.”</li>
+</ul>
+</section><section id="smart-constructors-returning-widgets" class="slide level2">
+<h2>Smart Constructors Returning Widgets</h2>
+<ul>
+<li><p>All smart constructors can return <code>Widget</code> values:</p>
+<pre class="haskell"><code>widget Button [] :: Widget event
+
+bin ScrolledWindow [] _ :: Widget event
+
+container ScrolledWindow [] _ :: Widget event</code></pre></li>
+</ul>
+</section><section id="smart-constructors-returning-markup" class="slide level2 fragile">
+<h2>Smart Constructors Returning Markup</h2>
+<ul>
+<li><p>They can also return specialized markup:</p>
+<pre class="haskell"><code>textRow :: Text -&gt; <mark class="inline">MarkupOf (Bin ListBoxRow Widget) Event ()</mark>
+textRow t =
+  bin ListBoxRow [] $
+    widget Label [ #label := t ]
+
+myList :: Widget Event
+myList =
+  container ListBox [] $
+    <mark class="inline">mapM textRow [&quot;Foo&quot;, &quot;Bar&quot;, &quot;Baz&quot;]</mark></code></pre></li>
+</ul>
+</section></section>
+<section><section id="experience-report-from-fastcut" class="title-slide slide level1"><h1>Experience Report from FastCut</h1></section><section id="gtk-in-fastcut" class="slide level2">
+<h2>GTK+ in FastCut</h2>
+<ul>
+<li>First try was imperative, got stuck directly</li>
+<li><code>gi-gtk-declarative</code> let me build with pure functions:
+<ul>
+<li>Complex timeline navigation</li>
+<li>Timeline commands (insert, delete, etc)</li>
+</ul></li>
+<li>Dropping down to imperative:
+<ul>
+<li>Custom window setup</li>
+<li>CSS style contexts</li>
+<li>Top-level key event listeners</li>
+<li>Dialogs and prompts</li>
+<li>Custom application architecture (indexed monad FSM)</li>
+</ul></li>
+</ul>
+</section><section id="timeline-view" class="slide level2">
+<h2>Timeline View</h2>
+<pre class="haskell"><code>timelineView :: Project -&gt; Focus ft -&gt; Widget (Event TimelineMode)
+timelineView project focus =
+  container Box [#orientation := OrientationVertical] $ do
+    boxChild True True 0 $
+      renderPreviewPane (firstCompositionPart focus (project ^. timeline))
+    boxChild False False 0 $ container
+      ScrolledWindow
+      [ #hscrollbarPolicy := PolicyTypeAutomatic
+      , #vscrollbarPolicy := PolicyTypeNever
+      , classes [&quot;timeline-container&quot;]
+      ]
+      (renderComposition (applyFocus (project ^. timeline) focus))</code></pre>
+</section><section id="property-based-testing-in-fastcut" class="slide level2">
+<h2>Property-Based Testing in FastCut</h2>
+<ul>
+<li>Timeline navigation, insertion, and deletion; all pure functions</li>
+<li>Property-based testing
+<ul>
+<li>Hedgehog</li>
+<li>Generating 10000 sequences of commands</li>
+<li>Each generated command is based on previous resulting state</li>
+<li>Each sequence must end with a valid timeline and focus</li>
+<li>Caught many bugs and corner cases I hadn’t thought of</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="summary" class="title-slide slide level1"><h1>Summary</h1></section><section id="summary-1" class="slide level2">
+<h2>Summary</h2>
+<ul>
+<li>Callback-centric GUI programming is hard</li>
+<li>Use pure functions and data structures for your core application code</li>
+<li>Make rendering a function <code>Model -&gt; Widget</code></li>
+<li>GTK+ can be programmed in a declarative fashion using <code>gi-gtk-declarative</code>
+<ul>
+<li>Still experimental</li>
+<li>I haven’t built anything large using <code>App.Simple</code></li>
+<li>I have done zero benchmarking</li>
+</ul></li>
+<li>FastCut has been a joy to build in this style</li>
+</ul>
+</section></section>
+<section><section id="thank-you" class="title-slide slide level1"><h1>Thank You!</h1></section></section>
+    </div>
+  </div>
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: false,
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+        // Transition speed
+        transitionSpeed: 'fast', // default/fast/slow
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>

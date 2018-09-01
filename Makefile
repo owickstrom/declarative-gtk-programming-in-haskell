@@ -97,5 +97,9 @@ target/images/%: src/images/%
 serve: html-slides
 	serve -p 10000 target/html
 
+.PHONY: pages
+pages: html-slides
+	cp -r target/html/ docs
+
 clean:
 	rm -rf target
