@@ -99,6 +99,7 @@ serve: html-slides
 
 .PHONY: pages
 pages: html-slides
+	rm -rf docs
 	cp -r target/html/ docs
 
 clean:

@@ -516,4 +516,7 @@ timelineView project focus =
     - I have done zero benchmarking
 * FastCut has been a joy to build in this style
 
-# Thank You!
+## Thank You!
+
+* Slides: [owickstrom.github.io/declarative-gtk-programming-in-haskell/](https://owickstrom.github.io/declarative-gtk-programming-in-haskell/)
+* Code examples and slides source code: [github.com/owickstrom/declarative-gtk-programming-in-haskell/](https://github.com/owickstrom/declarative-gtk-programming-in-haskell/)
