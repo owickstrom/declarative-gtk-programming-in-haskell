@@ -1,0 +1,10 @@
+resolver: lts-12.4
+
+extra-deps:
+  - git: git@github.com:owickstrom/gi-gtk-declarative.git
+    commit: 54dc7b5786e9bca8340c5cdbfeabe1d213171139
+    subdirs:
+      - gi-gtk-declarative
+      - gi-gtk-declarative-app-simple
+packages:
+  - .
