@@ -302,9 +302,7 @@ This is “Hello, world” in haskell-gi (explain code)
 <h2>Bins</h2>
 <ul>
 <li><p>In GTK+, a <em>bin</em> can only contain a single child widget</p>
-<pre class="haskell"><code>bin ScrolledWindow [] $
-  widget Button []
-</code></pre></li>
+<pre class="haskell"><code></code></pre></li>
 <li>Other examples are:
 <ul>
 <li><code>Expander</code></li>
@@ -317,17 +315,17 @@ This is “Hello, world” in haskell-gi (explain code)
 <h2>Containers</h2>
 <ul>
 <li>Containers can contain zero or more child widgets</li>
-<li><p>Some containers restrict the type of their children:</p>
+<li><p>In this library, containers restrict the type of their children:</p>
 <ul>
 <li><p><code>ListBox</code> requires each child to be a <code>ListBoxRow</code>:</p>
 <pre class="haskell"><code>container ListBox [] $ do
   bin ListBoxRow [] $ widget Button []
-  bin ListBoxRow [] $ widget Button []
+  bin ListBoxRow [] $ widget CheckButton []
 </code></pre></li>
 <li><p><code>Box</code> requires each child to be a <code>BoxChild</code>:</p>
 <pre class="haskell"><code>container Box [] $ do
   boxChild False False 0 $ widget Button []
-  boxChild True True 0 $ widget Button []
+  boxChild True True 0 $ widget CheckButton []
 </code></pre></li>
 </ul></li>
 </ul>

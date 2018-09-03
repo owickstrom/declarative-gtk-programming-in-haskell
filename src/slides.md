@@ -224,7 +224,7 @@ main = do
 ## Containers
 
 * Containers can contain zero or more child widgets
-* Some containers restrict the type of their children:
+* In this library, containers restrict the type of their children:
 
     - `ListBox` requires each child to be a `ListBoxRow`:
 
