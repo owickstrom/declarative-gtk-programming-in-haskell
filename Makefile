@@ -79,6 +79,7 @@ target/html/index.html: $(SRCS) src/header.html src/theme.css $(IMAGES)
 	pandoc $(PANDOC_FLAGS) \
 		-t revealjs \
 		-V theme=owickstrom \
+		-V controls=true \
 		-V transition=slide \
 		-V transitionSpeed=fast \
 		--no-highlight \
